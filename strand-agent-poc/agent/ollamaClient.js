@@ -17,7 +17,7 @@ class OllamaClient {
                 prompt: fullPrompt,
                 stream: false,
                 options: {
-                    temperature: 0.2,
+                    temperature: 0.8,
                     num_predict: 4000
                 }
             });
@@ -61,6 +61,35 @@ Base values:
 - Trend: Start at 15%, increase by 2% each month (vary by ±5%)
 
 Return ONLY the JSON object. No other text.`;
+
+        const response = await this.generate(prompt, systemPrompt);
+        return this.cleanGraphData(response);
+    }
+
+    async generateBusinessMetricsTable(manufacturer) {
+        const systemPrompt = `You are a business metrics table generator. Return ONLY valid JSON.
+
+Output format:
+{
+  "title": "string",
+  "columns": ["Column1", "Column2", ...],
+  "rows": [
+    {"metric": "string", "values": [...]}
+  ]
+}`;
+        
+        const prompt = `Generate a business metrics table for ${manufacturer.name}.
+
+You decide:
+- Number of columns (5-12 columns)
+- Number of rows (6-15 metrics)
+- Column names (e.g., Week-52, Week-1, T4W, YTD, WoW, YoY, QoQ, etc.)
+- Metric names (e.g., Net GMS, Revenue, Units, ASP, Margin, etc.)
+
+Use profit=${manufacturer.profit}, yoy=${manufacturer.yoy}%, mom=${manufacturer.mom}% as base.
+Add 🔴 for negative %, 🟢 for positive % in percentage columns.
+
+Return ONLY the JSON object.`;
 
         const response = await this.generate(prompt, systemPrompt);
         return this.cleanGraphData(response);

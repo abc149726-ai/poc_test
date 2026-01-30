@@ -209,7 +209,7 @@ const ManufacturerTable = () => {
                                     {showDeepDive && (
                                         <TableCell>
                                             <Box sx={{ display: 'flex', gap: 1 }}>
-                                                <Button size="small" variant="text" onClick={() => navigate('/table1')}>Link 1</Button>
+                                                <Button size="small" variant="text" onClick={() => navigate(`/table1?name=${encodeURIComponent(row.name)}&profit=${row.profit}&yoy=${row.yoy}&mom=${row.mom}`)}>Link 1</Button>
                                                 <Button size="small" variant="text" onClick={() => navigate('/table2')}>Link 2</Button>
                                             </Box>
                                         </TableCell>

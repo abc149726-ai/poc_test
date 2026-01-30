@@ -37,6 +37,48 @@ app.post('/api/generate-graph', async (req, res) => {
     }
 });
 
+app.post('/api/generate-metrics-table', async (req, res) => {
+    try {
+        const { manufacturer } = req.body;
+        
+        console.log(`\n📊 Generating metrics table for: ${manufacturer.name}`);
+        console.log('⏱️  This will take 5-10 seconds...\n');
+        
+        const tableData = await ollama.generateBusinessMetricsTable(manufacturer);
+        
+        if (!tableData) {
+            throw new Error('Failed to generate table from Ollama');
+        }
+        
+        const markdown = convertToMarkdown(tableData);
+        
+        console.log('✅ Metrics table generated successfully!\n');
+        
+        res.json({ 
+            success: true, 
+            data: tableData,
+            markdown: markdown,
+            manufacturer: manufacturer.name
+        });
+    } catch (error) {
+        console.error('❌ Error generating table:', error.message);
+        res.status(500).json({ 
+            success: false, 
+            error: error.message 
+        });
+    }
+});
+
+function convertToMarkdown(tableData) {
+    let md = `# ${tableData.title}\n\n`;
+    md += '| ' + tableData.columns.join(' | ') + ' |\n';
+    md += '|' + tableData.columns.map(() => '------').join('|') + '|\n';
+    tableData.rows.forEach(row => {
+        md += `| **${row.metric}** | ${row.values.join(' | ')} |\n`;
+    });
+    return md;
+}
+
 const PORT = 3001;
 app.listen(PORT, () => {
     console.log(`\n🚀 Graph API Server running on http://localhost:${PORT}`);
